@@ -1,0 +1,10 @@
+---
+
+- import_tasks: common.yml
+- import_tasks: init.yml
+  when: kubernetes_init|bool
+- import_tasks: master.yml
+  when: kubernetes_master|bool
+- import_tasks: worker.yml
+  when: kubernetes_worker|bool
+- import_tasks: post.yml

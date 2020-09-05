@@ -1,0 +1,11 @@
+---
+
+- name: create join config
+  template:
+    src: templates/join-config.yaml.j2
+    dest: "{{ ansible_env.HOME }}/join-config.yaml"
+
+- name: join cluster as worker
+  shell: kubeadm join --config {{ ansible_env.HOME }}/join-config.yaml > {{ ansible_env.HOME }}/join_cluster
+  args:
+    creates: "{{ ansible_env.HOME }}/join_cluster"

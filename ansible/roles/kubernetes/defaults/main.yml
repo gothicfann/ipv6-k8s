@@ -1,0 +1,32 @@
+---
+
+# Kubernetes Phases
+kubernetes_init: false
+kubernetes_master: false
+kubernetes_worker: false
+kubernetes_upgrade: false
+
+# Kubernetes Nodes
+kubernetes_master_nodes: []
+kubernetes_worker_nodes: []
+
+# Kubernetes Component Versions
+kubernetes_docker_version: 18.06.2.ce-3.el7
+kubernetes_version: 1.18.8
+kubernetes_kubelet_version: "{{ kubernetes_version }}"
+kubernetes_kubeadm_version: "{{ kubernetes_version }}"
+kubernetes_kubectl_version: "{{ kubernetes_version }}"
+
+# Kubernetes Network Configs
+kubernetes_pod_network_cidr: 10.71.0.0/16
+kubernetes_service_network_cidr: 10.72.0.0/16
+kubernetes_apiserver_advertise_address: "{{ ansible_default_ipv4.address }}"
+kubernetes_apiserver_advertise_port: 6443
+
+# ApiServer Load Balancer Configs
+kubernetes_control_endpoint_address: k8s-api.example.com
+kubernetes_control_endpoint_port: 6443
+
+# Kubernetes Secrets
+kubernetes_token: je4d1r.ppu18g9m7o9vxmgy
+kubernetes_certificate_key: 10172baeca57fe97b41e6719de8a8f35e4769f4cb256ae2a89bb532e6d44ebac

@@ -1,0 +1,14 @@
+{{ baselinux_motd_banner }}
+
+  * HOSTNAME: {{ ansible_fqdn }}
+  * OS: {{ ansible_distribution }} {{ ansible_distribution_version }}
+  * KERNEL: {{ ansible_kernel }}
+  * IP: {{ ansible_default_ipv4.address }}
+{% for nameserver in ansible_dns.nameservers %}
+  * DNS{{ loop.index }}: {{ nameserver }} 
+{% endfor %}
+
++-------------------------------------------------+
+|   UNAUTHORIZED ACCESS IS STRICTLY PROHIBITED!   |
++-------------------------------------------------+
+

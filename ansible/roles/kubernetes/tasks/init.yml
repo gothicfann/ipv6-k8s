@@ -1,0 +1,32 @@
+---
+
+- name: create init config
+  template:
+    src: templates/init-config.yaml.j2
+    dest: "{{ ansible_env.HOME }}/init-config.yaml"
+
+- name: initialize kubernetes cluster
+  shell: kubeadm init --upload-certs --config {{ ansible_env.HOME }}/init-config.yaml > {{ ansible_env.HOME }}/init_cluster
+  args:
+    creates: "{{ ansible_env.HOME }}/init_cluster"
+
+- name: create kubeconfig dir
+  file:
+    path: "{{ ansible_env.HOME }}/.kube"
+    state: directory
+
+- name: copy admin.conf to kubeconfig
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: "{{ ansible_env.HOME }}/.kube/config"
+    remote_src: yes
+
+- name: copy kubernetes network configuration
+  template:
+    src: templates/calico.yaml.j2
+    dest: "{{ ansible_env.HOME }}/calico.yaml"
+
+- name: install kubernetes network provider
+  shell: kubectl apply -f {{ ansible_env.HOME }}/calico.yaml > {{ ansible_env.HOME }}/network_provider_installed
+  args:
+    creates: "{{ ansible_env.HOME }}/network_provider_installed"

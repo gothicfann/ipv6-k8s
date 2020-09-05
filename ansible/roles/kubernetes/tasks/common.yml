@@ -1,0 +1,147 @@
+---
+
+- name: install epel-release
+  yum:
+    name: epel-release
+    state: present
+
+- name: install docker repo
+  copy:
+    src: files/repos/docker.repo
+    dest: /etc/yum.repos.d/docker.repo
+
+- name: install kubernetes repo
+  copy:
+    src: files/repos/kubernetes.repo
+    dest: /etc/yum.repos.d/kubernetes.repo
+
+- name: install gluster repo
+  yum:
+    name: centos-release-gluster
+    state: present
+
+- name: disable swappiness
+  shell: swapoff -a > {{ ansible_env.HOME }}/swap_disabled
+  args:
+    creates: "{{ ansible_env.HOME }}/swap_disabled"
+
+- name: configure fstab
+  replace:
+    path: /etc/fstab
+    regexp: '.*swap.*'
+    replace: ''
+
+- name: install required packages
+  yum:
+    name:
+      - yum-utils
+      - device-mapper-persistent-data
+      - lvm2
+    state: present
+
+- name: install docker
+  yum:
+    name: "docker-ce-{{ kubernetes_docker_version }}"
+    state: present
+    allow_downgrade: yes
+  notify:
+    - restart docker
+
+- name: create docker config dir
+  file:
+    path: /etc/docker
+    state: directory
+
+- name: configure docker
+  copy:
+    src: files/docker/daemon.json
+    dest: /etc/docker/daemon.json
+  notify:
+    - restart docker
+
+- name: create docker systemd dir
+  file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+    recurse: yes
+  notify:
+    - restart docker
+
+- name: start/enable docker
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: install kubelet
+  yum:
+    name: "kubelet-{{ kubernetes_kubelet_version }}"
+    state: present
+    allow_downgrade: yes
+  notify:
+    - upgrade cluster
+    - upgrade node
+    - restart kubelet
+
+- name: configure kubelet
+  copy:
+    src: files/kubelet/kubelet
+    dest: /etc/sysconfig/kubelet
+  notify:
+    - restart kubelet
+
+- name: install kubeadm
+  yum:
+    name: "kubeadm-{{ kubernetes_kubeadm_version }}"
+    state: present
+    allow_downgrade: yes
+  notify:
+    - upgrade cluster
+    - upgrade node
+    - restart kubelet
+
+- name: install kubectl
+  yum:
+    name: "kubectl-{{ kubernetes_kubectl_version }}"
+    state: present
+    allow_downgrade: yes
+  notify:
+    - upgrade cluster
+    - upgrade node
+    - restart kubelet
+
+- name: start/enable kubelet
+  systemd:
+    name: kubelet
+    state: started
+    enabled: yes
+
+- name: modify sysctl
+  sysctl:
+    name: "{{ item }}"
+    value: 1
+    state: present
+  with_items:
+    - net.bridge.bridge-nf-call-ip6tables
+    - net.bridge.bridge-nf-call-iptables
+    - net.ipv6.conf.all.forwarding
+    - net.ipv6.conf.all.accept_ra
+
+- name: enable br_netfilter module
+  modprobe:
+    name: br_netfilter
+    state: present
+
+- shell: sleep 20
+
+- name: gather new facts
+  setup:
+    gather_subset:
+      - all
+
+- shell: sleep 20
+
+- name: modify /etc/hosts file
+  template:
+    src: templates/hosts.j2
+    dest: /etc/hosts

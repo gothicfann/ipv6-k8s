@@ -1,0 +1,1 @@
+KUBELET_EXTRA_ARGS=--read-only-port=10255

@@ -1,0 +1,32 @@
+---
+
+- name: upload certificates/renew certificate key
+  shell: kubeadm init phase upload-certs --upload-certs --certificate-key {{ kubernetes_certificate_key }}
+  when: kubernetes_init
+
+- name: create join config
+  template:
+    src: templates/join-config.yaml.j2
+    dest: "{{ ansible_env.HOME }}/join-config.yaml"
+  when: not kubernetes_init
+
+- name: join cluster as master
+  shell: kubeadm join --config {{ ansible_env.HOME }}/join-config.yaml > {{ ansible_env.HOME }}/join_cluster
+  args:
+    creates: "{{ ansible_env.HOME }}/join_cluster"
+  when: not kubernetes_init
+
+- name: create kubeconfig dir
+  file:
+    path: "{{ ansible_env.HOME }}/.kube"
+    state: directory
+
+- name: copy admin.conf to kubeconfig
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: "{{ ansible_env.HOME }}/.kube/config"
+    remote_src: yes
+
+- name: taint master nodes to run pods on them
+  shell: kubectl taint nodes --all node-role.kubernetes.io/master-
+  ignore_errors: yes

@@ -1,0 +1,40 @@
+---
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: ClusterConfiguration
+kubernetesVersion: "{{ kubernetes_version }}"
+controlPlaneEndpoint: "[{{ kubernetes_control_endpoint_address }}]:{{ kubernetes_control_endpoint_port }}"
+apiServer:
+  extraArgs:
+    bind-address: "{{ kubernetes_apiserver_advertise_address }}"
+controllerManager:
+  extraArgs:
+    configure-cloud-routes: "false"
+    bind-address: "{{ kubernetes_apiserver_advertise_address }}"
+networking:
+  podSubnet: "{{ kubernetes_pod_network_cidr }}"
+  serviceSubnet: "{{ kubernetes_service_network_cidr }}"
+scheduler:
+  extraArgs:
+    address: "{{ kubernetes_apiserver_advertise_address }}"
+    bind-address: "::1"
+---
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: InitConfiguration
+bootstrapTokens:
+- token: "{{ kubernetes_token }}"
+  description: "kubeadm bootstrap token"
+  ttl: "0"
+localAPIEndpoint:
+  advertiseAddress: "{{ kubernetes_apiserver_advertise_address }}"
+  bindPort: {{ kubernetes_apiserver_advertise_port }}
+nodeRegistration:
+  kubeletExtraArgs:
+    fail-swap-on: "false"
+    node-ip: "{{ kubernetes_apiserver_advertise_address }}"
+certificateKey: "{{ kubernetes_certificate_key }}"
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+address: "{{ kubernetes_apiserver_advertise_address }}"
+healthzBindAddress: "{{ kubernetes_apiserver_advertise_address }}"
+

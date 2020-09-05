@@ -1,0 +1,34 @@
+---
+# Baselinux
+baselinux_root_passwd: "ipv6k8sdemo"
+baselinux_sshd_port: "22"
+baselinux_sshd_logingracetime: "60m"
+baselinux_sshd_permitrootlogin: "no"
+baselinux_sshd_maxauthtries: "6"
+baselinux_sshd_pubkeyauthentication: "yes"
+baselinux_sshd_passwordauthentication: "yes"
+baselinux_nameservers:
+  - 2001:4860:4860::8888
+  - 2001:4860:4860::8844
+  - 8.8.8.8
+
+# Kubernetes Component Versions
+kubernetes_docker_version: 19.03.12-3.el7
+kubernetes_version: 1.18.8
+kubernetes_kubelet_version: "{{ kubernetes_version }}"
+kubernetes_kubeadm_version: "{{ kubernetes_version }}"
+kubernetes_kubectl_version: "{{ kubernetes_version }}"
+
+# Kubernetes Network Configs
+kubernetes_pod_network_cidr: "fd02:03b1:b348:a041:0000:0000:0000::/110"
+kubernetes_service_network_cidr: "fd85:f5a3:2367:ff59:0000:0000:0000::/110"
+kubernetes_apiserver_advertise_address: "::"
+kubernetes_apiserver_advertise_port: 6443
+
+# ApiServer Load Balancer Configs
+kubernetes_control_endpoint_address: "{{ hostvars['k8s_1']['ansible_default_ipv6']['address'] }}"
+kubernetes_control_endpoint_port: 6443
+
+# Kubernetes Secrets
+kubernetes_token: je4d1r.ppu18g9m7o9vxmgy
+kubernetes_certificate_key: 10172baeca57fe97b41e6719de8a8f35e4769f4cb256ae2a89bb532e6d44ebac

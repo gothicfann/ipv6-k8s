@@ -1,0 +1,51 @@
+---
+baselinux_hostname: "{{ inventory_hostname }}"
+baselinux_timezone: "UTC"
+baselinux_selinux_mode: "permissive"
+
+baselinux_root_passwd: "password"
+
+baselinux_sshd_port: "22"
+baselinux_sshd_logingracetime: "60m"
+baselinux_sshd_permitrootlogin: "yes"
+baselinux_sshd_maxauthtries: "6"
+baselinux_sshd_pubkeyauthentication: "yes"
+baselinux_sshd_passwordauthentication: "yes"
+baselinux_ssh_stricthostkeychecking: "no"
+baselinux_ssh_userknownhostsfile: "/dev/null"
+
+baselinux_figlet_string: "Nandi"
+
+baselinux_nameservers:
+  - 8.8.8.8
+  - 8.8.4.4
+
+baselinux_pkgs:
+  - vim
+  - wget
+  - mlocate
+  - chrony
+  - htop
+  - jq
+  - telnet
+  - nmap
+  - bash-completion
+  - bind-utils
+  - curl
+  - screen
+  - net-tools
+  - git
+  - iotop
+  - open-vm-tools
+  - psmisc
+  - ca-certificates
+  - sysstat
+  - nload
+  - iftop
+  - strace
+  - gdb
+  - figlet
+  - lsof
+  - nfs-utils
+  - cifs-utils
+  - NetworkManager
